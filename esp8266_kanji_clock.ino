@@ -1,5 +1,5 @@
 //================================================================
-// esp8266_kanji_clock
+// esp8266_kanji_clock.ino
 //
 // An ESP8266 based NTP clock which displays time using kanji
 // characters on 8x8 LED matrix displays.
@@ -7,6 +7,7 @@
 //  * Adafruit 8x8 LED Matrix (4)
 //  * other stuff
 //
+
 // Carter Nelson
 // 2016-02-02
 //================================================================
@@ -22,7 +23,6 @@ unsigned int minute = 0;
 //-----------
 // The 8x8 LED Matrices
 //-----------
-
 Adafruit_8x8matrix matrix[4] = {
   Adafruit_8x8matrix() ,
   Adafruit_8x8matrix() ,
@@ -60,8 +60,7 @@ static PROGMEM const uint8_t KANJI_BLANK[] =
     B00000000,
     B00000000,
     B00000000,
-    B00000000  };
-        
+    B00000000  };       
 static PROGMEM const uint8_t KANJI_DIGIT[][8] = {
   //   ZERO
   { B00111100,
@@ -197,7 +196,7 @@ void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
         row = pgm_read_byte(bitmap + (y+7-i));    // read the byte from PROGMEM
         row = byteShift(row);                     // fixes apparent LSB/MSB disagreement
         row = row << 7 | row >> 1;                // rotate to fix memory buffer error
-        matrix->displaybuffer[y] = row;            // set it
+        matrix->displaybuffer[y] = row;           // set it
       }
     }
     matrix->writeDisplay();
@@ -208,7 +207,9 @@ void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
 //--------------------------------------------------------
 // get_NTP_time
 //
-// send NTP request
+// Send request to NTP server. Reused NTP related code
+// found here:
+//   https://github.com/sandeepmistry/esp8266-Arduino/blob/master/esp8266com/esp8266/libraries/ESP8266WiFi/examples/NTPClient/NTPClient.ino
 //--------------------------------------------------------
 void get_NTP_time() {
   Serial.println("sending NTP packet...");
@@ -270,7 +271,7 @@ void get_NTP_time() {
     // print the hour, minute and second:
     hour = int((epoch  % 86400L) / 3600);
     minute = int((epoch % 3600) / 60);
-    Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
+    Serial.print("Seattle time is ");       // UTC is the time at Greenwich Meridian (GMT)
     Serial.print(hour);
     Serial.print(":");
     Serial.println(minute);
@@ -306,10 +307,8 @@ void display_time() {
       digit[i] = D[i];
       scroll_down_bmp(KANJI_DIGIT[digit[i]], &matrix[i]); 
     }
-  }
-  
+  } 
 }
-
 
 //--------------------------------------------------------
 // S E T U P
@@ -319,10 +318,10 @@ void setup() {
   Serial.println("ESP8266 NTP Kanji Clock");
 
   // Initialize 8x8 LED matrices
-  matrix[0].begin(0x70);  // pass in the address
-  matrix[1].begin(0x71);  // pass in the address
-  matrix[2].begin(0x72);  // pass in the address
-  matrix[3].begin(0x73);  // pass in the address
+  matrix[0].begin(0x70);  // tens digit for hour
+  matrix[1].begin(0x71);  // ones digit for hour
+  matrix[2].begin(0x72);  // tens digit for minute
+  matrix[3].begin(0x73);  // ones digit for minute
   for (int i=0; i<4; i++) {
     scroll_down_bmp(KANJI_DIGIT[digit[i]], &matrix[i]);
   }  
@@ -352,7 +351,7 @@ void setup() {
 // L O O P
 //--------------------------------------------------------
 void loop() {
-  get_NTP_time();
-  display_time();
-  delay(10000);    
+  get_NTP_time();     // get the time
+  display_time();     // display it
+  delay(10000);       // wait 10 seconds
 }

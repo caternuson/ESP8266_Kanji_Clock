@@ -1,2 +1,3 @@
 # ESP8266_Kanji_Clock
-A ESP8266 based clock which displays time using kanji characters.
+An ESP8266 based NTP clock which displays time using kanji
+characters on 8x8 LED matrix displays.
