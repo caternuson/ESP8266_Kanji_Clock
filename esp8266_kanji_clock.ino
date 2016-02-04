@@ -276,10 +276,10 @@ void get_NTP_time() {
     minute = int((epoch_SEA % 3600) / 60);
 
     // print local time
-    Serial.print("Seattle time is ");
-    Serial.print(hour);
-    Serial.print(":");
-    Serial.println(minute);
+    //Serial.print("Seattle time is ");
+    //Serial.print(hour);
+    //Serial.print(":");
+    //Serial.println(minute);
   }
 }
 
@@ -296,7 +296,7 @@ void display_time() {
     minute % 10
   };
 
-  Serial.println("DISPLAY:");
+  Serial.print("DISPLAY: ");
   Serial.print("[");
   Serial.print(D[0]);
   Serial.print("][");
