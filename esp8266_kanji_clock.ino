@@ -193,7 +193,7 @@ void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
         matrix->displaybuffer[y] = matrix->displaybuffer[y-1];
       } else {
         row = pgm_read_byte(bitmap + (y+7-i));    // read the byte from PROGMEM
-        row = byteFlip(row);                     // fixes apparent LSB/MSB disagreement
+        row = byteFlip(row);                      // fixes apparent LSB/MSB disagreement
         row = row << 7 | row >> 1;                // rotate to fix memory buffer error
         matrix->displaybuffer[y] = row;           // set it
       }
@@ -209,6 +209,8 @@ void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
 // Send request to NTP server. Reused NTP related code
 // found here:
 //   https://github.com/sandeepmistry/esp8266-Arduino/blob/master/esp8266com/esp8266/libraries/ESP8266WiFi/examples/NTPClient/NTPClient.ino
+// See RFC 5905 for UDP datagram description:
+//   https://tools.ietf.org/html/rfc5905
 //--------------------------------------------------------
 void get_NTP_time() {
   Serial.println("sending NTP packet...");
@@ -216,15 +218,16 @@ void get_NTP_time() {
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
   // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-  packetBuffer[1] = 0;     // Stratum, or type of clock
-  packetBuffer[2] = 6;     // Polling Interval
-  packetBuffer[3] = 0xEC;  // Peer Clock Precision
-  // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12]  = 49;
-  packetBuffer[13]  = 0x4E;
-  packetBuffer[14]  = 49;
-  packetBuffer[15]  = 52;
+  packetBuffer[0] = 0b11100011;     // LI, Version, Mode
+  packetBuffer[1] = 0;              // Stratum, or type of clock
+  packetBuffer[2] = 6;              // Polling Interval
+  packetBuffer[3] = 0xEC;           // Peer Clock Precision 0xEC = -20
+  // [4]-[7]  = 0                   // Root Delay
+  // [8]-[11] = 0                   // Root Dispersion
+  packetBuffer[12]  = 49;           // '1' four-character ASCII "kiss code"
+  packetBuffer[13]  = 0x4E;         // 'N'           "
+  packetBuffer[14]  = 49;           // '1'           "
+  packetBuffer[15]  = 52;           // '4'           "
 
   // all NTP fields have been given values, now
   // you can send a packet requesting a timestamp:
@@ -251,26 +254,29 @@ void get_NTP_time() {
     // combine the four bytes (two words) into a long integer
     // this is NTP time (seconds since Jan 1 1900):
     unsigned long secsSince1900 = highWord << 16 | lowWord;
-    Serial.print("Seconds since Jan 1 1900 = " );
-    Serial.println(secsSince1900);
+    //Serial.print("Seconds since Jan 1 1900 = " );
+    //Serial.println(secsSince1900);
 
     // now convert NTP time into everyday time:
-    //Serial.print("Unix time = ");
     // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
     const unsigned long seventyYears = 2208988800UL;
     // subtract seventy years:
     unsigned long epoch = secsSince1900 - seventyYears;
     // print Unix time:
+    //Serial.print("Unix time = ");
     //Serial.println(epoch);
 
     // adjust epoch to local time
+    // UTC is the time at Greenwich Meridian (GMT)
     // Seattle = UTC - 8 hours
-    epoch -= (8 * 3600);
+    unsigned long epoch_SEA = epoch - (8 * 3600);
     
-    // print the hour, minute and second:
-    hour = int((epoch  % 86400L) / 3600);
-    minute = int((epoch % 3600) / 60);
-    Serial.print("Seattle time is ");       // UTC is the time at Greenwich Meridian (GMT)
+    // set globals used by clock display
+    hour = int((epoch_SEA  % 86400L) / 3600);
+    minute = int((epoch_SEA % 3600) / 60);
+
+    // print local time
+    Serial.print("Seattle time is ");
     Serial.print(hour);
     Serial.print(":");
     Serial.println(minute);
