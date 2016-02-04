@@ -154,13 +154,13 @@ static PROGMEM const uint8_t KANJI_DIGIT[][8] = {
 };
 
 //--------------------------------------------------------
-// byteShift
+// byteFlip
 // "00110011" becomes "11001100"
 //
 // found here:
 //    http://www.nrtm.org/index.php/2013/07/25/reverse-bits-in-a-byte/
 //--------------------------------------------------------
-byte byteShift(byte num) {
+byte byteFlip(byte num) {
   byte var = 0;     
   int i, x, y, p;
   int s = 8;    // number of bits in 'num'.
@@ -193,7 +193,7 @@ void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
         matrix->displaybuffer[y] = matrix->displaybuffer[y-1];
       } else {
         row = pgm_read_byte(bitmap + (y+7-i));    // read the byte from PROGMEM
-        row = byteShift(row);                     // fixes apparent LSB/MSB disagreement
+        row = byteFlip(row);                     // fixes apparent LSB/MSB disagreement
         row = row << 7 | row >> 1;                // rotate to fix memory buffer error
         matrix->displaybuffer[y] = row;           // set it
       }
