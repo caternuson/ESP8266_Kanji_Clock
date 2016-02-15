@@ -33,8 +33,7 @@ unsigned int digit[4] = {0, 0, 0, 0};
 //-----------
 // Local network setup
 //-----------
-const char* ssid     = "XXXX";
-const char* password = "XXXX";
+#include "network_config.h"     // MY_SSID and MY_PASSWORD defined here
 unsigned int localPort = 6677;
 
 //-----------
@@ -333,8 +332,8 @@ void setup() {
 
   // Connect to WiFi network
   Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.println(MY_SSID);
+  WiFi.begin(MY_SSID, MY_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
