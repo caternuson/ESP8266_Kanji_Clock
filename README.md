@@ -1,4 +1,4 @@
-# rpi-laser
+# ESP8266_Kanji_Clock
 ![thumbnail](http://caternuson.github.io/kanji-clock-thumb.jpg)<br/>
 Arduino code for ESP8266 based kanji clock.
 
@@ -24,11 +24,16 @@ $ git clone https://github.com/caternuson/ESP8266_Kanji_Clock.git
 ```
 
 # Configure
-Create a file called ```network_config.h``` and in it define your network configuration.
+Create a file called ```network_config.h``` and define your network configuration:
 ```c++
 #define MY_SSID "your_ssid"
 #define MY_PASSWORD "your_password"
 ```
+Change the NTP address to nearest ![server](http://tf.nist.gov/tf-cgi/servers.cgi):
+```c++
+IPAddress NTPServer (216, 228, 192, 69);
+```
+TODO: add configurable GMT offset
 
 # Build
 Open ```esp8266_kanji_clock.ino``` in the Arduino IDE and load onto ESP8266.
