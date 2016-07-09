@@ -5,7 +5,7 @@
 // characters on 8x8 LED matrix displays.
 //  * Adafruit ESP8266 Huzzah
 //  * Adafruit 8x8 LED Matrix (4)
-//  * other stuff
+//  * wood, glass, and other stuff
 //
 // Carter Nelson
 // 2016-02-02
@@ -14,7 +14,6 @@
 #include <WiFiUdp.h>
 #include <Wire.h>
 #include <Adafruit_LEDBackpack.h>
-#include <Adafruit_GFX.h>
 
 #include "kanji_clock_config.h"    
 
@@ -33,36 +32,28 @@ Adafruit_8x8matrix matrix[4] = {
 };
 
 //-----------
-// Local network setup
+// NTP stuff
 //-----------
-//unsigned int localPort = PORT;
-
-//-----------
-// NTP server setup
-// see list here: http://tf.nist.gov/tf-cgi/servers.cgi
-// nist-time-server.eoni.com  216.228.192.69  La Grande, Oregon
-//-----------
-IPAddress NTPServer NTP_SERVER_ADDR;
+#define NTP_PACKET_SIZE 48
 byte packetBuffer[NTP_PACKET_SIZE];
 WiFiUDP udp;
-//unsigned long sendNTPRequest(); 
 
 //-----------
-// bitmaps
+// Bitmaps
 //-----------
 static const uint64_t KANJI_BLANK = 0x0000000000000000;
 static const uint64_t KANJI_DIGIT[] =
   {
-    0x3c4281818181423c ,
-    0x000000ff00000000 ,
-    0x00ff0000007e0000 ,
-    0xff00003c00007e00 ,
-    0x81ff81b3d59595ff ,
-    0xff44487e08087e00 ,
-    0x81422400ff080804 ,
-    0x788808087e080800 ,
-    0xc162241414141400 ,
-    0x61a22424243f0404   
+    0x3c4281818181423c ,    // 0
+    0x000000ff00000000 ,    // 1
+    0x00ff0000007e0000 ,    // 2     
+    0xff00003c00007e00 ,    // 3
+    0x81ff81b3d59595ff ,    // 4
+    0xff44487e08087e00 ,    // 5
+    0x81422400ff080804 ,    // 6
+    0x788808087e080800 ,    // 7
+    0xc162241414141400 ,    // 8
+    0x61a22424243f0404      // 9   
   };
 
 //--------------------------------------------------------
@@ -104,82 +95,57 @@ void set_raw64(uint64_t value, uint8_t m) {
 }
 
 //--------------------------------------------------------
+// is_daylight_saving
+//
+// Return true if Daylight Saving is ON
+//--------------------------------------------------------
+bool is_daylight_saving() {
+  return digitalRead(12);
+}
+
+//--------------------------------------------------------
 // get_NTP_time
 //
-// Send request to NTP server. Reused NTP related code
-// found here:
-//   https://github.com/sandeepmistry/esp8266-Arduino/blob/master/esp8266com/esp8266/libraries/ESP8266WiFi/examples/NTPClient/NTPClient.ino
-// See RFC 5905 for UDP datagram description:
+// Send request to NTP server. See RFC 5905 for UDP
+// datagram description:
 //   https://tools.ietf.org/html/rfc5905
 //--------------------------------------------------------
 void get_NTP_time() {
-  Serial.println("sending NTP packet...");
-  // set all bytes in the buffer to 0
+  // Set up buffer for request
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
-  // Initialize values needed to form NTP request
-  // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;     // LI, Version, Mode
-  packetBuffer[1] = 0;              // Stratum, or type of clock
-  packetBuffer[2] = 6;              // Polling Interval
-  packetBuffer[3] = 0xEC;           // Peer Clock Precision 0xEC = -20
-  // [4]-[7]  = 0                   // Root Delay
-  // [8]-[11] = 0                   // Root Dispersion
-  packetBuffer[12]  = 49;           // '1' four-character ASCII "kiss code"
-  packetBuffer[13]  = 0x4E;         // 'N'           "
-  packetBuffer[14]  = 49;           // '1'           "
-  packetBuffer[15]  = 52;           // '4'           "
+  packetBuffer[0] = 0xE3;
 
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
-  udp.beginPacket(NTPServer, 123); //NTP requests are to port 123
+  // Make request
+  udp.beginPacket("pool.ntp.org", 123);
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
 
-  // deal with UDP packet
-  int cb = udp.parsePacket();
-  if (!cb) {
-    Serial.println("no packet yet");
-  }
-  else {
-    Serial.print("packet received, length=");
-    Serial.println(cb);
-    // We've received a packet, read the data from it
-    udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+  // Process request
+  int bytes_recvd = udp.parsePacket();
+  if (!bytes_recvd) {
+    Serial.println("Nothing received.");
+  } else {
+    Serial.print("Received packet length=");
+    Serial.println(bytes_recvd);
 
-    //the timestamp starts at byte 40 of the received packet and is four bytes,
-    // or two words, long. First, esxtract the two words:
+    // Read response into buffer
+    udp.read(packetBuffer, NTP_PACKET_SIZE);
 
-    unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-    unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-    // combine the four bytes (two words) into a long integer
-    // this is NTP time (seconds since Jan 1 1900):
-    unsigned long secsSince1900 = highWord << 16 | lowWord;
-    //Serial.print("Seconds since Jan 1 1900 = " );
-    //Serial.println(secsSince1900);
+    // Extract seconds since 1900
+    uint32_t time_1900 = packetBuffer[40] << 24 | 
+                         packetBuffer[41] << 16 |
+                         packetBuffer[42] <<  8 |
+                         packetBuffer[43] ;
 
-    // now convert NTP time into everyday time:
-    // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-    const unsigned long seventyYears = 2208988800UL;
-    // subtract seventy years:
-    unsigned long epoch = secsSince1900 - seventyYears;
-    // print Unix time:
-    //Serial.print("Unix time = ");
-    //Serial.println(epoch);
+    // Convert to local time
+    uint32_t time_local = time_1900 + (GMT_OFFSET * 3600);
 
-    // adjust epoch to local time
-    // UTC is the time at Greenwich Meridian (GMT)
-    // Seattle = UTC - 8 hours
-    unsigned long epoch_SEA = epoch - (8 * 3600);
-    
-    // set globals used by clock display
-    hour = int((epoch_SEA  % 86400L) / 3600);
-    minute = int((epoch_SEA % 3600) / 60);
+    // Adjust for Daylight Saving
+    if (is_daylight_saving()) time_local += 3600;   
 
-    // print local time
-    //Serial.print("Seattle time is ");
-    //Serial.print(hour);
-    //Serial.print(":");
-    //Serial.println(minute);
+    // Update globals
+    hour = int((time_local % 86400L) / 3600);
+    minute = int((time_local % 3600) / 60);    
   }
 }
 
@@ -189,8 +155,7 @@ void get_NTP_time() {
 // display the current time on the 8x8 LED matrices
 //--------------------------------------------------------
 void display_time() {
-  
-  // compute digits
+  // Compute digits
   unsigned int D[4] = {
     hour / 10,
     hour % 10,
@@ -209,7 +174,7 @@ void display_time() {
   Serial.print(D[3]);
   Serial.println("]");
 
-  // update digits that have changed
+  // Update digits that have changed
   for (int i=0; i<4; i++) {
     if (D[i]!=digit[i]) {
       digit[i] = D[i];
@@ -219,11 +184,17 @@ void display_time() {
 }
 
 //--------------------------------------------------------
-// S E T U P
+//                S  E  T  U  P
 //--------------------------------------------------------
 void setup() {
   Serial.begin(115200);
   Serial.println("ESP8266 NTP Kanji Clock");
+
+  // Pins used for daylight saving switch
+  pinMode(12, INPUT_PULLUP);
+  pinMode(14, OUTPUT);
+  digitalWrite(14, LOW);
+  pinMode(16, INPUT_PULLUP);
 
   // Initialize 8x8 LED matrices
   matrix[0].begin(0x70);  // tens digit for hour
@@ -256,7 +227,7 @@ void setup() {
 }
 
 //--------------------------------------------------------
-// L O O P
+//                    L  O  O  P
 //--------------------------------------------------------
 void loop() {
   get_NTP_time();     // get the time
