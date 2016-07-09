@@ -3,41 +3,141 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
-  <div class="container">
+<body class="bd-docs">
+<div class="container">
+  <p>
     <h1>KANJI CLOCK</h1>
-    <p>A clock with kanji digits.</p>
-    <div class="row">
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_ONE" src="KANJI_ONE.jpg"/></div>
-      <div class="col-xs-2">1</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_TWO" src="KANJI_TWO.jpg"/></div>
-      <div class="col-xs-2">2</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_THREE" src="KANJI_THREE.jpg"/></div>
-      <div class="col-xs-2">3</div>
+    <h5>ESP8266 based NTP clock with kanji digits.</h5>
+    <a class="btn btn-primary" target="_blank" href="https://github.com/caternuson/ESP8266_Kanji_Clock">View on GitHub</a>  
+  </p>      
+</div>
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#tab_home"><span class="material-icons">home</span></a></li>
+    <li><a data-toggle="tab" href="#tab_software"><span class="material-icons">computer</span></a></li>
+    <li><a data-toggle="tab" href="#tab_build"><span class="material-icons">settings</span></a></li>
+  </ul>
+  <div class="tab-content">
+    <div id="tab_home" class="tab-pane active">
+      <p>
+      <figure>
+        <img class="img-rounded img-responsive" src="static/kanji-clock-glamshot.jpg"/>
+        <figcaption class="small"><strong>The Kanji Clock showing 9:24AM.</strong></figcaption>
+      </figure>
+      </p>
+      <p>
+        Displays the current time using kanji number icons on 8x8 LED
+        matrices. Based on a
+        <a target="_blank" href="https://www.adafruit.com/products/2471">ESP8266 HUZZAH</a>
+        using
+        <a target="_blank" href="https://www.adafruit.com/categories/325">LED matrices</a>
+        from
+        <a target="_blank" href="https://www.adafruit.com/">Adafruit</a>.
+        Housed in a custom built wood and glass enclosure.
+      </p>
+      <h3>ICON SUMMARY</h3>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_1.jpg"/><strong>1</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_2.jpg"/><strong>2</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_3.jpg"/><strong>3</strong>
+          </div>
+        </div>
+        <div class="row"><div class="col-xs-12"><p></p></div></div>
+        <div class="row">
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_4.jpg"/><strong>4</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_5.jpg"/><strong>5</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_6.jpg"/><strong>6</strong>
+          </div>
+        </div>
+        <div class="row"><div class="col-xs-12"><p></p></div></div>
+        <div class="row">
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_7.jpg"/><strong>7</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_8.jpg"/><strong>8</strong>
+          </div>
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_9.jpg"/><strong>9</strong>
+          </div>
+        </div>
+        <div class="row"><div class="col-xs-12"><p></p></div></div>
+        <div class="row">
+          <div class="col-xs-4">
+            <img class="img-responsive" src="static/kanji_0.jpg"/><strong>0</strong>
+          </div>
+          <div class="col-xs-8">
+            <p></p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="row">
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_FOUR" src="KANJI_FOUR.jpg"/></div>
-      <div class="col-xs-2">4</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_FIVE" src="KANJI_FIVE.jpg"/></div>
-      <div class="col-xs-2">5</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_SIX" src="KANJI_SIX.jpg"/></div>
-      <div class="col-xs-2">6</div>
+    <div id="tab_software" class="tab-pane">
+      <h2>SOFTWARE</h2>
+      <p>
+        The software is available on <a target="_blank" href="https://github.com/caternuson/ESP8266_Kanji_Clock">GitHub</a>.
+      </p>
     </div>
-    <div class="row">
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_SEVEN" src="KANJI_SEVEN.jpg"/></div>
-      <div class="col-xs-2">7</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_EIGHT" src="KANJI_EIGHT.jpg"/></div>
-      <div class="col-xs-2">8</div>
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_NINE" src="KANJI_NINE.jpg"/></div>
-      <div class="col-xs-2">9</div>
-    </div>
-    <div class="row">
-      <div class="col-xs-2"><img class="img-responsive" alt="KANJI_ZERO" src="KANJI_ZERO.jpg"/></div>
-      <div class="col-xs-2">0</div>
-      <div class="col-xs-8"></div>
+    <div id="tab_build" class="tab-pane">
+      <h2>HARDWARE</h2>
+      <p>
+        Here are some details about the clock hardware.
+        The overall parts are shown below.
+        <figure>
+          <img class="img-rounded img-responsive" src="static/kanji-clock-exploded-labels.jpg"/>
+          <figcaption class="small"><strong>(1) Glass Vase, (2) and (3) Wooden End Blocks, (4)
+          LED Holder, (5) Wooden Base, (6) Fasteners for End Block, (7) HUZZAH Mounting Fasteners,
+          (8) HUZZAH ESP8266 Breakout Board.</strong></figcaption>
+        </figure>
+      </p>
+      <p>
+        The LEDs are tied to wooden sticks held together by round wooden end pieces
+        as shown below.
+        <figure>
+          <img class="img-rounded img-responsive" src="static/kanji-clock-led-holder.jpg"/>
+          <figcaption class="small"><strong>Detail of LED holder.</strong></figcaption>
+        </figure>
+      </p>
+      <p>
+        The LED holder is inserted into the glass vase. Power and I2C cables are
+        routed through the wooden end blocks.
+        <figure>
+          <img class="img-rounded img-responsive" src="static/kanji-clock-assy1.jpg"/>
+          <figcaption class="small"><strong>LED holder inserted into glass case.</strong></figcaption>
+        </figure>
+      </p>
+      <p>
+        All parts are brought together and secured using fasteners.
+        <figure>
+          <img class="img-rounded img-responsive" src="static/kanji-clock-assy2.jpg"/>
+          <figcaption class="small"><strong>Final assembly steps.</strong></figcaption>
+        </figure>
+      </p>
+      <p>
+        Load the code. Apply power. And done.
+        <figure>
+          <img class="img-rounded img-responsive" src="static/kanji-clock-glamshot.jpg"/>
+          <figcaption class="small"><strong>The final product.</strong></figcaption>
+        </figure>
+      </p>
     </div>
   </div>
+</div>
 </body>  
 </html>
