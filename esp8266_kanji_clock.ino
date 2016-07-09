@@ -16,8 +16,11 @@
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 
+#include "kanji_clock_config.h"    
+
 unsigned int hour = 0;
 unsigned int minute = 0;
+unsigned int digit[4] = {0, 0, 0, 0};
 
 //-----------
 // The 8x8 LED Matrices
@@ -28,178 +31,76 @@ Adafruit_8x8matrix matrix[4] = {
   Adafruit_8x8matrix() ,
   Adafruit_8x8matrix() ,  
 };
-unsigned int digit[4] = {0, 0, 0, 0};
 
 //-----------
 // Local network setup
 //-----------
-#include "network_config.h"     // MY_SSID and MY_PASSWORD defined here
-unsigned int localPort = 6677;
+//unsigned int localPort = PORT;
 
 //-----------
 // NTP server setup
 // see list here: http://tf.nist.gov/tf-cgi/servers.cgi
 // nist-time-server.eoni.com  216.228.192.69  La Grande, Oregon
 //-----------
-IPAddress NTPServer (216, 228, 192, 69);
-const int NTP_PACKET_SIZE = 48;
+IPAddress NTPServer NTP_SERVER_ADDR;
 byte packetBuffer[NTP_PACKET_SIZE];
 WiFiUDP udp;
-unsigned long sendNTPRequest(); 
+//unsigned long sendNTPRequest(); 
 
 //-----------
 // bitmaps
 //-----------
-static PROGMEM const uint8_t KANJI_BLANK[] = 
-  { B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B00000000  };       
-static PROGMEM const uint8_t KANJI_DIGIT[][8] = {
-  //   ZERO
-  { B00111100,
-    B01000010,
-    B10000001,
-    B10000001,
-    B10000001,
-    B10000001,
-    B01000010,
-    B00111100  }  ,
-  //   ONE
-  { B00000000,
-    B00000000,
-    B00000000,
-    B00000000,
-    B11111111,
-    B00000000,
-    B00000000,
-    B00000000  }  ,
-  //   TWO
-  { B00000000,
-    B00000000,
-    B01111110,
-    B00000000,
-    B00000000,
-    B00000000,
-    B11111111,
-    B00000000  }  ,
-  //   THREE
-  { B00000000,
-    B01111110,
-    B00000000,
-    B00000000,
-    B00111100,
-    B00000000,
-    B00000000,
-    B11111111  }  ,
-  //   FOUR
-  { B11111111,
-    B10101001,
-    B10101001,
-    B10101011,
-    B11001101,
-    B10000001,
-    B11111111,
-    B10000001  }  ,
-  //   FIVE
-  { B00000000,
-    B01111110,
-    B00010000,
-    B00010000,
-    B01111110,
-    B00010010,
-    B00100010,
-    B11111111  }  ,
-  //   SIX
-  { B00100000,
-    B00010000,
-    B00010000,
-    B11111111,
-    B00000000,
-    B00100100,
-    B01000010,
-    B10000001  }  ,
-  //   SEVEN
-  { B00000000,
-    B00010000,
-    B00010000,
-    B01111110,
-    B00010000,
-    B00010000,
-    B00010001,
-    B00011110  }  ,
-  //   EIGHT
-  { B00000000,
-    B00101000,
-    B00101000,
-    B00101000,
-    B00101000,
-    B00100100,
-    B01000110,
-    B10000011  }  ,
-  //   NINE
-  { B00100000,
-    B00100000,
-    B11111100,
-    B00100100,
-    B00100100,
-    B00100100,
-    B01000101,
-    B10000110  }  ,
-};
+static const uint64_t KANJI_BLANK = 0x0000000000000000;
+static const uint64_t KANJI_DIGIT[] =
+  {
+    0x3c4281818181423c ,
+    0x000000ff00000000 ,
+    0x00ff0000007e0000 ,
+    0xff00003c00007e00 ,
+    0x81ff81b3d59595ff ,
+    0xff44487e08087e00 ,
+    0x81422400ff080804 ,
+    0x788808087e080800 ,
+    0xc162241414141400 ,
+    0x61a22424243f0404   
+  };
 
 //--------------------------------------------------------
-// byteFlip
-// "00110011" becomes "11001100"
+// scroll_raw64
 //
-// found here:
-//    http://www.nrtm.org/index.php/2013/07/25/reverse-bits-in-a-byte/
+// Scroll out the current bitmap with the supplied bitmap.
+// Can also specify a matrix (0-3) and a delay to set scroll
+// rate.
 //--------------------------------------------------------
-byte byteFlip(byte num) {
-  byte var = 0;     
-  int i, x, y, p;
-  int s = 8;    // number of bits in 'num'.
- 
-  for (i = 0; i < (s / 2); i++) {
-    // extract bit on the left, from MSB
-    p = s - i - 1;
-    x = num & (1 << p);
-    x = x >> p;  
-    // extract bit on the right, from LSB
-    y = num & (1 << i);
-    y = y >> i;
- 
-    var = var | (x << i);       // apply x
-    var = var | (y << p);       // apply y
-  }
-  return var;
-}
-  
-//--------------------------------------------------------
-// scroll_down_bmp
-//
-// replace current contents with bitmap via scroll
-//--------------------------------------------------------
-void scroll_down_bmp(const uint8_t *bitmap, Adafruit_8x8matrix* matrix) {
-  uint8_t row;
-  for (int i=0; i<=7; i++) {
-    for (int y=7; y>=0; y--) {
-      if (y>i) {
-        matrix->displaybuffer[y] = matrix->displaybuffer[y-1];
-      } else {
-        row = pgm_read_byte(bitmap + (y+7-i));    // read the byte from PROGMEM
-        row = byteFlip(row);                      // fixes apparent LSB/MSB disagreement
-        row = row << 7 | row >> 1;                // rotate to fix memory buffer error
-        matrix->displaybuffer[y] = row;           // set it
-      }
+void scroll_raw64(uint64_t value, uint8_t m, uint8_t d) {
+  uint8_t row_byte;
+  for (int s=7; s>=0; s--) {
+    for (int r=7; r>=1; r--) {
+      matrix[m].displaybuffer[r] = matrix[m].displaybuffer[r-1];
     }
-    matrix->writeDisplay();
-    delay(150);
+    row_byte = (value >> (8*s)) & 0xff;
+    row_byte = (row_byte << 7 | row_byte >> 1) & 0xff;
+    matrix[m].displaybuffer[0] = row_byte;
+    matrix[m].writeDisplay();
+    delay(d);
   }
+}
+
+//--------------------------------------------------------
+// set_raw64
+//
+// Set specified matrix to bitmap defined by 64 bit value.
+//--------------------------------------------------------
+void set_raw64(uint64_t value, uint8_t m) {
+  uint8_t row_byte, pixel_bit;
+  for (int y=0; y<=7; y++) {
+    row_byte = value >> (8*y);
+    for (int x=0; x<=7; x++) {
+      pixel_bit = row_byte >> x & 0x01;
+      matrix[m].drawPixel(x, y, pixel_bit);
+    }
+  }
+  matrix[m].writeDisplay();
 }
 
 //--------------------------------------------------------
@@ -288,6 +189,8 @@ void get_NTP_time() {
 // display the current time on the 8x8 LED matrices
 //--------------------------------------------------------
 void display_time() {
+  
+  // compute digits
   unsigned int D[4] = {
     hour / 10,
     hour % 10,
@@ -306,10 +209,11 @@ void display_time() {
   Serial.print(D[3]);
   Serial.println("]");
 
+  // update digits that have changed
   for (int i=0; i<4; i++) {
     if (D[i]!=digit[i]) {
       digit[i] = D[i];
-      scroll_down_bmp(KANJI_DIGIT[digit[i]], &matrix[i]); 
+      scroll_raw64(KANJI_DIGIT[digit[i]], i, SCROLL_DELAY);
     }
   } 
 }
@@ -327,7 +231,7 @@ void setup() {
   matrix[2].begin(0x72);  // tens digit for minute
   matrix[3].begin(0x73);  // ones digit for minute
   for (int i=0; i<4; i++) {
-    scroll_down_bmp(KANJI_DIGIT[digit[i]], &matrix[i]);
+    set_raw64(KANJI_DIGIT[digit[i]], i);
   }  
 
   // Connect to WiFi network
@@ -345,7 +249,7 @@ void setup() {
 
   // Start UDP
   Serial.print("Starting UDP...");
-  udp.begin(localPort);
+  udp.begin(PORT);
   Serial.print("Done. [port ");
   Serial.print(udp.localPort());
   Serial.println("]"); 
