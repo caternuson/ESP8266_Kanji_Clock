@@ -45,8 +45,15 @@ Details on how to programm the HUZZAH can be found
 ![here](https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout).
 
 # Icon Summary
-| COL | COL | COL |
-|:---:|:---:|:---:|
-|![1](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_1.jpg)
-|![2](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_2.jpg)
-|![3](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_3.jpg)|
+| ICON | VALUE |
+|:---:|:---:|
+|![1](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_1.jpg)| 1 |
+|![2](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_2.jpg)| 2 |
+|![3](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_3.jpg)| 3 |
+|![4](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_4.jpg)| 4 |
+|![5](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_5.jpg)| 5 |
+|![6](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_6.jpg)| 6 |
+|![7](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_7.jpg)| 7 |
+|![8](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_8.jpg)| 8 |
+|![9](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_9.jpg)| 9 |
+|![0](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_0.jpg)| 0 |
