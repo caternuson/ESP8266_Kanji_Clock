@@ -45,6 +45,7 @@ Details on how to programm the HUZZAH can be found
 ![here](https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout).
 
 # Icon Summary
+| COL | COL | COL |
 |:---:|:---:|:---:|
 |![1](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_1.jpg)
 |![2](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_2.jpg)
