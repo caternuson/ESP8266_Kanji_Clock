@@ -43,3 +43,9 @@ $ git clone https://github.com/caternuson/ESP8266_Kanji_Clock.git
 and then use the Arduino IDE with ESP8266 board package to upload the sketch.
 Details on how to programm the HUZZAH can be found
 ![here](https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout).
+
+# Icon Summary
+|:---:|:---:|:---:|
+|![1](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_1.jpg)
+|![2](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_2.jpg)
+|![3](http://caternuson.github.io/ESP8266_Kanji_Clock/static/kanji_3.jpg)|
