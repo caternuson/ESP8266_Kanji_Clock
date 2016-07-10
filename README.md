@@ -3,19 +3,19 @@
 Displays the current time using kanji digits.
 
 # Hardware
-* Adafruit ![HUZZAH ESP8266 Breakout](https://www.adafruit.com/products/2471)
-* Adafruit ![Mini 8x8 LED Matrix w/I2C Backpack](https://www.adafruit.com/products/870)
+* Adafruit ![HUZZAH ESP8266 Breakout](http://www.adafruit.com/products/2471)
+* Adafruit ![Mini 8x8 LED Matrix w/I2C Backpack](http://www.adafruit.com/products/870)
     * any color x 4
 * Wood and glass
-* ![USB Console Cable](https://www.adafruit.com/products/954) for programming
+* ![USB Console Cable](http://www.adafruit.com/products/954) for programming
     
 # Software
 The main program is ```esp8266_kanji_clock.ino```.
 
 # Dependencies
 * ESP8266 Board Package for the Arduino IDE
-    * Follow ![these](https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout/using-arduino-ide) instructions.
-* ![Adafruit LED Backpack library](https://github.com/adafruit/Adafruit_LED_Backpack)
+    * Follow ![these](http://learn.adafruit.com/adafruit-huzzah-esp8266-breakout/using-arduino-ide) instructions.
+* ![Adafruit LED Backpack library](http://github.com/adafruit/Adafruit_LED_Backpack)
 
 # Configure (REQUIRED)
 Create a file called ```kanji_clock_config.h``` with the following contents:
@@ -42,7 +42,7 @@ $ git clone https://github.com/caternuson/ESP8266_Kanji_Clock.git
 ```
 and then use the Arduino IDE with ESP8266 board package to upload the sketch.
 Details on how to programm the HUZZAH can be found
-![here](https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout).
+![here](http://learn.adafruit.com/adafruit-huzzah-esp8266-breakout).
 
 # Icon Summary
 | ICON | VALUE |
