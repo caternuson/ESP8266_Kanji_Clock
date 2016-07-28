@@ -32,7 +32,7 @@ Create a file called ```kanji_clock_config.h``` with the following contents:
 #define SCROLL_DELAY 150
 ```
 Change the Wifi network ID and password accordingly. Also set the `GMT_OFFSET`
-to you local time zone. The display scroll speed can be controlled by altering
+to your local time zone. The display scroll speed can be controlled by altering
 the `SCROLL_DELAY`.
 
 # Install
